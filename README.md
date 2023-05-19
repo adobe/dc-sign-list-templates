@@ -12,7 +12,7 @@ This Java-based command-line tool provides a simple method to list all the libra
 
 As the tool makes use of the [Adobe Sign REST API](https://secure.adobesign.com/public/docs/restapi/v6), it is necessary to [provide an integration key](https://helpx.adobe.com/sign/kb/how-to-create-an-integration-key.html) for your account.
 
-To do this, follow the steps below (for each account):
+To do this, follow the steps below:
 
 1. Log in to your Acrobat Sign account (as an Account Administrator)
 2. Click **Account** from the menu
