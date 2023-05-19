@@ -8,6 +8,7 @@ import io.swagger.client.model.ApiException;
 import io.swagger.client.model.baseUris.BaseUriInfo;
 import io.swagger.client.model.libraryDocuments.LibraryDocument;
 import io.swagger.client.model.libraryDocuments.LibraryDocuments;
+import io.swagger.client.model.users.DetailedUserInfo;
 import io.swagger.client.model.users.UserInfo;
 import io.swagger.client.model.users.UsersInfo;
 import org.apache.commons.csv.CSVFormat;
@@ -19,7 +20,7 @@ public class ListTemplates {
     private static final String API_PATH = "api/rest/v6";
     private static final String API_USER_PREFIX = "email:";
     private static final String BEARER = "Bearer ";
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 1000;
     private static final int TIMEOUT = 300000;
     private static final String USAGE = "Usage: java -jar aas-list-templates-<version>.jar <integrationKey>";
 
@@ -71,36 +72,38 @@ public class ListTemplates {
              *  (c) Output details if they are the owner
              */
             for (UserInfo userInfo: userInfoList) {
-                String email = userInfo.getEmail();
-                String apiUser = API_USER_PREFIX + email;
-                LibraryDocuments libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                                                                            apiUser,
-                                                                                            null,
-                                                                                            Boolean.FALSE,
-                                                                                            null,
-                                                                                            PAGE_SIZE);
-                List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
-                while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
-                    for (LibraryDocument libraryDocument: libraryDocumentList) {
-                        String owner = libraryDocument.getOwnerEmail();
-                        String id = libraryDocument.getId();
-                        String name = libraryDocument.getName();
-                        if (email != null && email.equals(owner)) {
-                            System.out.println(format(id, name, owner));
+                DetailedUserInfo detail = usersApi.getUserDetail(accessToken, userInfo.getId(), null);
+                if (detail != null && detail.getStatus().equals(DetailedUserInfo.StatusEnum.ACTIVE)) {
+                    String email = userInfo.getEmail();
+                    String apiUser = API_USER_PREFIX + email;
+                    LibraryDocuments libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
+                            apiUser,
+                            null,
+                            Boolean.FALSE,
+                            null,
+                            PAGE_SIZE);
+                    List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
+                    while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
+                        for (LibraryDocument libraryDocument : libraryDocumentList) {
+                            String owner = libraryDocument.getOwnerEmail();
+                            String id = libraryDocument.getId();
+                            String name = libraryDocument.getName();
+                            if (email != null && email.equals(owner)) {
+                                System.out.println(format(id, name, owner));
+                            }
                         }
-                    }
-                    String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
-                    if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
-                        libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                                                                   apiUser,
-                                                                                   null,
-                                                                                   Boolean.FALSE,
-                                                                                   libraryDocumentCursor,
-                                                                                   PAGE_SIZE);
-                        libraryDocumentList = libraryDocuments.getLibraryDocumentList();
-                    }
-                    else {
-                        libraryDocumentList = null;
+                        String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
+                        if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
+                            libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
+                                    apiUser,
+                                    null,
+                                    Boolean.FALSE,
+                                    libraryDocumentCursor,
+                                    PAGE_SIZE);
+                            libraryDocumentList = libraryDocuments.getLibraryDocumentList();
+                        } else {
+                            libraryDocumentList = null;
+                        }
                     }
                 }
             }
