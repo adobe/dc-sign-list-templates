@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This Java-based command-line tool provides a simple method to list all the library templates within one [Adobe Acrobat Sign](https://www.adobe.com/sign.html) account.
+This Java-based command-line tool provides a simple method to list all the library templates within an [Adobe Acrobat Sign](https://www.adobe.com/sign.html) account.
 
 ## Set-Up Instructions
 
