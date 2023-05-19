@@ -77,29 +77,27 @@ public class ListTemplates {
                     String email = userInfo.getEmail();
                     String apiUser = API_USER_PREFIX + email;
                     LibraryDocuments libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                            apiUser,
-                            null,
-                            Boolean.FALSE,
-                            null,
-                            PAGE_SIZE);
+                                                                                                apiUser,
+                                                                                                null,
+                                                                                                Boolean.FALSE,
+                                                                                                null,
+                                                                                                PAGE_SIZE);
                     List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
                     while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
                         for (LibraryDocument libraryDocument : libraryDocumentList) {
                             String owner = libraryDocument.getOwnerEmail();
-                            String id = libraryDocument.getId();
-                            String name = libraryDocument.getName();
                             if (email != null && email.equals(owner)) {
-                                System.out.println(format(id, name, owner));
+                                System.out.println(format(libraryDocument.getId(), libraryDocument.getName(), owner));
                             }
                         }
                         String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
                         if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
                             libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                    apiUser,
-                                    null,
-                                    Boolean.FALSE,
-                                    libraryDocumentCursor,
-                                    PAGE_SIZE);
+                                                                                       apiUser,
+                                                                                       null,
+                                                                                       Boolean.FALSE,
+                                                                                       libraryDocumentCursor,
+                                                                                       PAGE_SIZE);
                             libraryDocumentList = libraryDocuments.getLibraryDocumentList();
                         } else {
                             libraryDocumentList = null;
