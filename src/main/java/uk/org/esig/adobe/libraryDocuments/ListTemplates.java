@@ -53,7 +53,7 @@ public class ListTemplates {
         apiClient.setBasePath(baseUriInfo.getApiAccessPoint() + API_PATH);
 
         /*
-         *  Instantiate APIs for source and destination accounts
+         *  Instantiate APIs for account
          */
         UsersApi usersApi = new UsersApi(apiClient);
         LibraryDocumentsApi libraryDocumentsApi = new LibraryDocumentsApi(apiClient);
@@ -63,13 +63,14 @@ public class ListTemplates {
          */
         UsersInfo usersInfo = usersApi.getUsers(accessToken, null, null, PAGE_SIZE);
         List<UserInfo> userInfoList = usersInfo.getUserInfoList();
-        System.out.println(format("template_id", "template_name", "owner_email"));
+        System.out.println(format("template_id", "template_name", "owner_email", "sharing_mode"));
         while (userInfoList != null && !userInfoList.isEmpty()) {
             /*
              *  For each user:
-             *  (a) Get the list of templates they have access to
-             *  (b) Check which of these the user owns
-             *  (c) Output details if they are the owner
+             *  (a) Make sure that they are ACTIVE
+             *  (b) Get the list of templates they have access to
+             *  (c) Check which of these the user owns
+             *  (d) Output details if, and only if, they are the owner
              */
             for (UserInfo userInfo: userInfoList) {
                 DetailedUserInfo detail = usersApi.getUserDetail(accessToken, userInfo.getId(), null);
@@ -87,7 +88,10 @@ public class ListTemplates {
                         for (LibraryDocument libraryDocument : libraryDocumentList) {
                             String owner = libraryDocument.getOwnerEmail();
                             if (email != null && email.equals(owner)) {
-                                System.out.println(format(libraryDocument.getId(), libraryDocument.getName(), owner));
+                                System.out.println(format(libraryDocument.getId(),
+                                                          libraryDocument.getName(),
+                                                          owner,
+                                                          libraryDocument.getSharingMode().name()));
                             }
                         }
                         String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
@@ -116,8 +120,8 @@ public class ListTemplates {
         }
     }
 
-    private String format(String id, String name, String email) {
-        return CSVFormat.EXCEL.format(id, name, email);
+    private String format(String id, String name, String email, String sharingMode) {
+        return CSVFormat.EXCEL.format(id, name, email, sharingMode);
     }
 
     private static String getExceptionDetails(ApiException e) {
