@@ -13,13 +13,16 @@ import io.swagger.client.model.users.UserInfo;
 import io.swagger.client.model.users.UsersInfo;
 import org.apache.commons.csv.CSVFormat;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ListTemplates {
     private static final String API_HOST = "https://api.adobesign.com/";
     private static final String API_PATH = "api/rest/v6";
     private static final String API_USER_PREFIX = "email:";
     private static final String BEARER = "Bearer ";
+    private static final int CAPACITY = 20000;
     private static final int PAGE_SIZE = 1000;
     private static final int TIMEOUT = 300000;
     private static final String USAGE = "Usage: java -jar aas-list-templates-<version>.jar <integrationKey>";
@@ -58,6 +61,7 @@ public class ListTemplates {
         UsersApi usersApi = new UsersApi(apiClient);
         LibraryDocumentsApi libraryDocumentsApi = new LibraryDocumentsApi(apiClient);
 
+        Map<String, LibraryDocument> foundTemplates = new HashMap<String, LibraryDocument>(CAPACITY);
         /*
          *  Obtain the first page of users
          */
@@ -69,8 +73,7 @@ public class ListTemplates {
              *  For each user:
              *  (a) Make sure that they are ACTIVE
              *  (b) Get the list of templates they have access to
-             *  (c) Check which of these the user owns
-             *  (d) Output details if, and only if, they are the owner
+             *  (c) Store/override the template in the foundTemplates map
              */
             for (UserInfo userInfo: userInfoList) {
                 DetailedUserInfo detail = usersApi.getUserDetail(accessToken, userInfo.getId(), null);
@@ -86,13 +89,8 @@ public class ListTemplates {
                     List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
                     while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
                         for (LibraryDocument libraryDocument : libraryDocumentList) {
-                            String owner = libraryDocument.getOwnerEmail();
-                            if (email != null && email.equals(owner)) {
-                                System.out.println(format(libraryDocument.getId(),
-                                                          libraryDocument.getName(),
-                                                          owner,
-                                                          libraryDocument.getSharingMode().name()));
-                            }
+                            // Use the template ID as the key, and override value if already present
+                            foundTemplates.put(libraryDocument.getId(), libraryDocument);
                         }
                         String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
                         if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
@@ -117,6 +115,16 @@ public class ListTemplates {
             else {
                 userInfoList = null;
             }
+        }
+
+        /*
+         *  Iterate over the map of foundTemplates, and output information
+         */
+        for (LibraryDocument libraryDocument: foundTemplates.values()) {
+            System.out.println(format(libraryDocument.getId(),
+                                      libraryDocument.getName(),
+                                      libraryDocument.getOwnerEmail(),
+                                      libraryDocument.getSharingMode().name()));
         }
     }
 
