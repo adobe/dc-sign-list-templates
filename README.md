@@ -28,9 +28,10 @@ To do this, follow the steps below:
 + Execute the following command, replacing:
   + `<version>` with the appropriate value for the release, such as `1.0.0`
   + `<integrationKey>` with your saved value from above
+  + `[--sandbox]` optional flag if the integration key is for a Sandbox account
 
 ```sh
-java -jar aas-list-templates-<version>.jar <integrationKey>
+java -jar aas-list-templates-<version>.jar <integrationKey> [--sandbox]
 ```
 
 Assuming you have specified the required parameters correctly, then you should see output similar to that below:
