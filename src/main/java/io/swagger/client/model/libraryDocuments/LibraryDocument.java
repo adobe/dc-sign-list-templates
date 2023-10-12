@@ -55,6 +55,9 @@ public class LibraryDocument {
   @SerializedName("id")
   private String id = null;
 
+  @SerializedName("groupId")
+  private String groupId = null;
+
   @SerializedName("hidden")
   private Boolean hidden = null;
 
@@ -264,6 +267,24 @@ public class LibraryDocument {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public LibraryDocument groupId(String groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  /**
+   * The unique group identifier that is used to refer to the group
+   * @return groupId
+   **/
+  @ApiModelProperty(value = "The unique group identifier that is used to refer to the group")
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(String groupId) {
+    this.groupId = groupId;
   }
 
   public LibraryDocument hidden(Boolean hidden) {

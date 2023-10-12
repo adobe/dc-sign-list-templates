@@ -1,11 +1,14 @@
 package uk.org.esig.adobe.libraryDocuments;
 
 import io.swagger.client.api.BaseUrisApi;
+import io.swagger.client.api.GroupsApi;
 import io.swagger.client.api.LibraryDocumentsApi;
 import io.swagger.client.api.UsersApi;
 import io.swagger.client.model.ApiClient;
 import io.swagger.client.model.ApiException;
 import io.swagger.client.model.baseUris.BaseUriInfo;
+import io.swagger.client.model.groups.GroupInfo;
+import io.swagger.client.model.groups.GroupsInfo;
 import io.swagger.client.model.libraryDocuments.LibraryDocument;
 import io.swagger.client.model.libraryDocuments.LibraryDocuments;
 import io.swagger.client.model.users.DetailedUserInfo;
@@ -65,16 +68,38 @@ public class ListTemplates {
         /*
          *  Instantiate APIs for account
          */
+        GroupsApi groupsApi = new GroupsApi(apiClient);
         UsersApi usersApi = new UsersApi(apiClient);
         LibraryDocumentsApi libraryDocumentsApi = new LibraryDocumentsApi(apiClient);
 
+        Map<String, String> foundGroups = new HashMap<>(CAPACITY);
         Map<String, LibraryDocument> foundTemplates = new HashMap<>(CAPACITY);
+
+        /*
+         *  Populate the list of groups
+         */
+        GroupsInfo groupsInfo = groupsApi.getGroups(accessToken, null, null, PAGE_SIZE);
+        List<GroupInfo> groupInfoList = groupsInfo.getGroupInfoList();
+        while (groupInfoList != null && !groupInfoList.isEmpty()) {
+            for (GroupInfo groupInfo: groupInfoList) {
+                foundGroups.put(groupInfo.getGroupId(), groupInfo.getGroupName());
+            }
+            String groupCursor = groupsInfo.getPage().getNextCursor();
+            if (groupCursor != null && !groupCursor.isEmpty()) {
+                groupsInfo = groupsApi.getGroups(accessToken, null, groupCursor, PAGE_SIZE);
+                groupInfoList = groupsInfo.getGroupInfoList();
+            }
+            else {
+                groupInfoList = null;
+            }
+        }
+
         /*
          *  Obtain the first page of users
          */
         UsersInfo usersInfo = usersApi.getUsers(accessToken, null, null, PAGE_SIZE);
         List<UserInfo> userInfoList = usersInfo.getUserInfoList();
-        System.out.println(format("template_id", "template_name", "owner_email", "sharing_mode"));
+        System.out.println(format("template_id", "template_name", "owner_email", "sharing_mode", "group_name"));
         while (userInfoList != null && !userInfoList.isEmpty()) {
             /*
              *  For each user:
@@ -128,15 +153,20 @@ public class ListTemplates {
          *  Iterate over the map of foundTemplates, and output information
          */
         for (LibraryDocument libraryDocument: foundTemplates.values()) {
+            String groupName = null;
+            if (libraryDocument.getSharingMode().name().equals(LibraryDocument.SharingModeEnum.GROUP.name())) {
+                groupName = foundGroups.get(libraryDocument.getGroupId());
+            }
             System.out.println(format(libraryDocument.getId(),
                                       libraryDocument.getName(),
                                       libraryDocument.getOwnerEmail(),
-                                      libraryDocument.getSharingMode().name()));
+                                      libraryDocument.getSharingMode().name(),
+                                      groupName));
         }
     }
 
-    private String format(String id, String name, String email, String sharingMode) {
-        return CSVFormat.EXCEL.format(id, name, email, sharingMode);
+    private String format(String id, String name, String email, String sharingMode, String groupName) {
+        return CSVFormat.EXCEL.format(id, name, email, sharingMode, groupName);
     }
 
     private static String getExceptionDetails(ApiException e) {
