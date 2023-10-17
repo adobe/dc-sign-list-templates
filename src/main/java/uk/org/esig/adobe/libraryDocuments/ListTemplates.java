@@ -16,6 +16,7 @@ import io.swagger.client.model.users.UserInfo;
 import io.swagger.client.model.users.UsersInfo;
 import org.apache.commons.csv.CSVFormat;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,30 +112,33 @@ public class ListTemplates {
                 DetailedUserInfo detail = usersApi.getUserDetail(accessToken, userInfo.getId(), null);
                 if (detail != null && detail.getStatus().equals(DetailedUserInfo.StatusEnum.ACTIVE)) {
                     String email = userInfo.getEmail();
-                    String apiUser = API_USER_PREFIX + email;
-                    LibraryDocuments libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                                                                                apiUser,
-                                                                                                null,
-                                                                                                Boolean.FALSE,
-                                                                                                null,
-                                                                                                PAGE_SIZE);
-                    List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
-                    while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
-                        for (LibraryDocument libraryDocument : libraryDocumentList) {
-                            // Use the template ID as the key, and override value if already present
-                            foundTemplates.put(libraryDocument.getId(), libraryDocument);
-                        }
-                        String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
-                        if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
-                            libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                                                                       apiUser,
-                                                                                       null,
-                                                                                       Boolean.FALSE,
-                                                                                       libraryDocumentCursor,
-                                                                                       PAGE_SIZE);
-                            libraryDocumentList = libraryDocuments.getLibraryDocumentList();
-                        } else {
-                            libraryDocumentList = null;
+                    if (StandardCharsets.US_ASCII.newEncoder().canEncode(email)) {
+                        String apiUser = API_USER_PREFIX + email;
+                        LibraryDocuments libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
+                                apiUser,
+                                null,
+                                Boolean.FALSE,
+                                null,
+                                PAGE_SIZE);
+                        List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
+                        while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
+                            for (LibraryDocument libraryDocument : libraryDocumentList) {
+                                // Use the template ID as the key, and override value if already present
+                                foundTemplates.put(libraryDocument.getId(), libraryDocument);
+                            }
+                            String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
+                            if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
+                                libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
+                                        apiUser,
+                                        null,
+                                        Boolean.FALSE,
+                                        libraryDocumentCursor,
+                                        PAGE_SIZE);
+                                libraryDocumentList = libraryDocuments.getLibraryDocumentList();
+                            }
+                            else {
+                                libraryDocumentList = null;
+                            }
                         }
                     }
                 }
