@@ -123,8 +123,10 @@ public class ListTemplates {
                         List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
                         while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
                             for (LibraryDocument libraryDocument : libraryDocumentList) {
-                                // Use the template ID as the key, and override value if already present
-                                foundTemplates.put(libraryDocument.getId(), libraryDocument);
+                                if (!libraryDocument.getSharingMode().equals(LibraryDocument.SharingModeEnum.GLOBAL)) {
+                                    // Use the template ID as the key, and override value if already present
+                                    foundTemplates.put(libraryDocument.getId(), libraryDocument);
+                                }
                             }
                             String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
                             if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
