@@ -65,3 +65,9 @@ Once this has completed, clone this repository and build the package by issuing:
 cd <location-of-cloned-tool-repo>
 mvn clean package
 ```
+
+## Contributing
+Contributions are welcomed! Read the [Contributing Guide](CODE_OF_CONDUCT.md) for more information.
+
+## Licensing
+This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
