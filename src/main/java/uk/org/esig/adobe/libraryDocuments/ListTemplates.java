@@ -36,6 +36,7 @@ import io.swagger.client.model.users.UserInfo;
 import io.swagger.client.model.users.UsersInfo;
 import org.apache.commons.csv.CSVFormat;
 
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ public class ListTemplates {
     private static final String API_PATH = "api/rest/v6";
     private static final String API_URL = "https://api.adobesign.com/";
     private static final String API_USER_PREFIX = "email:";
+    private static final CharsetEncoder ASCII_ENCODER = StandardCharsets.US_ASCII.newEncoder();
     private static final String BEARER = "Bearer ";
     private static final int CAPACITY = 20000;
     private static final int PAGE_SIZE = 1000;
@@ -132,14 +134,14 @@ public class ListTemplates {
                 DetailedUserInfo detail = usersApi.getUserDetail(accessToken, userInfo.getId(), null);
                 if (detail != null && detail.getStatus().equals(DetailedUserInfo.StatusEnum.ACTIVE)) {
                     String email = userInfo.getEmail();
-                    if (StandardCharsets.US_ASCII.newEncoder().canEncode(email)) {
+                    if (ASCII_ENCODER.canEncode(email)) {
                         String apiUser = API_USER_PREFIX + email;
                         LibraryDocuments libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                apiUser,
-                                null,
-                                Boolean.FALSE,
-                                null,
-                                PAGE_SIZE);
+                                                                                                    apiUser,
+                                                                                                    null,
+                                                                                                    Boolean.FALSE,
+                                                                                                    null,
+                                                                                                    PAGE_SIZE);
                         List<LibraryDocument> libraryDocumentList = libraryDocuments.getLibraryDocumentList();
                         while (libraryDocumentList != null && !libraryDocumentList.isEmpty()) {
                             for (LibraryDocument libraryDocument : libraryDocumentList) {
@@ -151,11 +153,11 @@ public class ListTemplates {
                             String libraryDocumentCursor = libraryDocuments.getPage().getNextCursor();
                             if (libraryDocumentCursor != null && !libraryDocumentCursor.isEmpty()) {
                                 libraryDocuments = libraryDocumentsApi.getLibraryDocuments(accessToken,
-                                        apiUser,
-                                        null,
-                                        Boolean.FALSE,
-                                        libraryDocumentCursor,
-                                        PAGE_SIZE);
+                                                                                           apiUser,
+                                                                                           null,
+                                                                                           Boolean.FALSE,
+                                                                                           libraryDocumentCursor,
+                                                                                           PAGE_SIZE);
                                 libraryDocumentList = libraryDocuments.getLibraryDocumentList();
                             }
                             else {

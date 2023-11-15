@@ -6,7 +6,7 @@
 
     <groupId>uk.org.esig</groupId>
     <artifactId>aas-list-templates</artifactId>
-    <version>2.5.0</version>
+    <version>2.6.0</version>
 
     <name>Adobe Acrobat List Templates</name>
     <description>This utility provides the ability to list all of the templates, and their owners, within a single Acrobat Sign account</description>
