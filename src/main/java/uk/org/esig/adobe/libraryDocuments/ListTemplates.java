@@ -53,7 +53,7 @@ public class ListTemplates {
     private static final String SANDBOX = "--sandbox";
     private static final String SANDBOX_API_URL = "https://api.adobesignsandbox.com/";
     private static final int TIMEOUT = 300000;
-    private static final String USAGE = "Usage: java -jar aas-list-templates-<version>.jar <integrationKey> [--sandbox]";
+    private static final String USAGE = "Usage: java -jar dc-sign-list-templates-<version>.jar <integrationKey> [--sandbox]";
 
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 2) {
