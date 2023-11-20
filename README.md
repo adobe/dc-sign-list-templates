@@ -67,7 +67,7 @@ mvn clean package
 ```
 
 ## Contributing
-Contributions are welcomed! Read the [Contributing Guide](CODE_OF_CONDUCT.md) for more information.
+Contributions are welcomed! Read the [Contributing Guide](./.github/CONTRIBUTING.md) for more information.
 
 ## Licensing
 This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
