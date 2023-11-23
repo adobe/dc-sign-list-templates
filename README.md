@@ -6,7 +6,7 @@ This Java-based command-line tool provides a simple method to list all the libra
 
 ## Set-Up Instructions
 
-+ Download the latest release of the `dc-sign-list-templates-<version>.jar` from the [Releases](https://git.corp.adobe.com/sign-acs/dc-sign-list-templates/releases) page
++ Download the latest release of the `dc-sign-list-templates-<version>.jar` from the [Releases](https://github.com/adobe/dc-sign-list-templates/releases) page
 + [Download Java 1.8](https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html), if you don't already have it installed on your machine
 + [IP Addresses to add to your allow list](https://helpx.adobe.com/sign/system-requirements.html#IPs), if needed
 
